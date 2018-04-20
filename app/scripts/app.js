@@ -35,6 +35,10 @@ Instructions:
 
     Your code goes here!
      */
+
+    return fetch(url, {  // / returns fetchResponce Promise
+      method: 'get'
+    });
   }
 
   /**
@@ -48,7 +52,18 @@ Instructions:
 
     Your code goes here!
      */
+    var fetchResponce = get(url); // fetchResponce is a Promise
+    console.dir(fetchResponce);
+
+    return fetchResponce  // OR: return get(url)
+      .then(function(response) {  // Adds first .then() to fetchResponce
+        console.dir(response); // response is a 'Responce' object created by the 'Fetch API'
+        var jsonPromise = response.json(); // it's like a stream and we can call its .json() method ony once
+                console.dir(jsonPromise);
+        return jsonPromise; // returns jsonPromise Promise
+      });
   }
+
 
   window.addEventListener('WebComponentsReady', function() {
     home = document.querySelector('section[data-route="home"]');
@@ -58,6 +73,39 @@ Instructions:
 
     Your code goes here too!
      */
-    // getJSON('../data/earth-like-results.json')
+    getJSON('../data/earth-like-results.json')
+    .then(function(jsonResponse) {  // Adds first .then() to jsonPromise
+      addSearchHeader(jsonResponse.query);
+      console.dir(jsonResponse); // jsonResponse is a json Object
+      return jsonResponse.results[0];
+    })
+    .then(function(url){ // Adds second .then() to jsonPromise
+      console.log(url);
+    })
+    .catch(function(error) {
+      addSearchHeader('unknown');
+      console.log(error);
+    });
   });
 })(document);
+
+/*
+
+fetch(url) // returns fetchResponce Promise
+    .then(function(response) {  // Adds first .then() to fetchResponce
+      return response.json();  // returns jsonResponse Promise
+    })
+    .then(function(jsonResponse) {  // Adds first .then() to jsonResponse
+      addSearchHeader(jsonResponse.query);
+      console.log(jsonResponse);
+      return jsonResponse.results[0];
+    })
+    .then(function(url){ // Adds second .then() to jsonResponse
+      console.log(url);
+    })
+    .catch(function(error) {
+      addSearchHeader('unknown');
+      console.log(error);
+    });
+
+*/
