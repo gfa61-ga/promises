@@ -60,13 +60,34 @@ Hint: you'll probably still need to use .map.
     Refactor this code with Promise.all!
      */
     getJSON('../data/earth-like-results.json')
-    .then(function(response) {
-
-      addSearchHeader(response.query);
-
-      response.results.map(function(url) {
-        getJSON(url).then(createPlanetThumb);
-      });
+    .then(function(jsonResponse) {
+      addSearchHeader(jsonResponse.query);
+      return Promise.all(
+        jsonResponse.results.map(function(url) { // or jsonResponse.results.map(getJSON);
+          return getJSON(url);
+        })
+      );
+    }).then(function(results) {
+        results.forEach(function(data) {
+          createPlanetThumb(data);
+        });
     });
   });
 })(document);
+
+/*  This was my first SOLUTION - with errors because
+    I need to run all promises to get tha json files of the planets first
+    and to keer them in an array, with the right order
+    and when these promises are all resolved then to create the thumbs
+
+    .then(function(response) {
+      var promiseArray = [];
+      addSearchHeader(response.query);
+
+      response.results.forEach(function(url) {
+        promiseArray.push(getJSON(url).then(createPlanetThumb));
+      });
+      Promise.all(promiseArray); // ERROR - this solution does not draw thumbs in the right order
+    });
+
+*/
