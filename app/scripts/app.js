@@ -62,11 +62,24 @@ Instructions:
     /*
     Refactor this code!
      */
-    getJSON('../data/earth-like-results.json')
-    .then(function(response) {
-      response.results.forEach(function(url) {
-        getJSON(url).then(createPlanetThumb);
+
+    getJSON('../data/earth-like-results.json').then(function(jsonResponce) {
+        addSearchHeader(jsonResponce.query);
+        var sequence = new Promise(function(resolve, reject) { // an empty promise that is always resolved
+          resolve();
+        });
+
+        // var sequence = Promise.resolve();
+
+        jsonResponce.results.forEach(function(url) {
+          sequence = sequence.then(function() { // thumbs are created in series
+                      // sequence.then(function() { // thumbs are created in parallel
+            return getJSON(url);
+          }).then(createPlanetThumb);
+        });
+      }).catch(function(error) {
+        console.log(error);
       });
-    });
+
   });
 })(document);
